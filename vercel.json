@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "builds": [{
+      "src": "hls-proxy/bin/hlsd.js",
+      "use": "@vercel/node"
+  }],
+  "routes": [{
+      "src": "/(.*)",
+      "dest": "hls-proxy/bin/hlsd.js"
+  }]
+}
