@@ -120,11 +120,21 @@ const debug = function() {
   }
 }
 
-const normalize_req_headers = function(req_headers) {
+const normalize_req_headers = function(req_headers, blacklist) {
   const normalized = {}
 
+  if (blacklist && !Array.isArray(blacklist))
+    blacklist = null
+  if (blacklist)
+    blacklist = blacklist.filter(val => val && (typeof val === 'string')).map(val => val.toLowerCase())
+  if (blacklist && !blacklist.length)
+    blacklist = null
+
   for (let name in req_headers) {
-    normalized[ name.toLowerCase() ] = req_headers[name]
+    const lc_name = name.toLowerCase()
+
+    if (!blacklist || (blacklist.indexOf(lc_name) === -1))
+      normalized[lc_name] = req_headers[name]
   }
 
   return normalized
@@ -134,7 +144,7 @@ const get_request_options = function(params, url, is_m3u8, referer_url, inbound_
   const {copy_req_headers, req_headers, req_options, hooks, http_proxy} = params
 
   const copied_req_headers = (copy_req_headers && inbound_req_headers && (inbound_req_headers instanceof Object))
-    ? normalize_req_headers(inbound_req_headers)
+    ? normalize_req_headers(inbound_req_headers, ['host'])
     : null
 
   const additional_req_options = (hooks && (hooks instanceof Object) && hooks.add_request_options && (typeof hooks.add_request_options === 'function'))
