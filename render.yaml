@@ -1,0 +1,5 @@
+services:
+  - type: web
+    name: blog site
+    env: docker
+    plan: free
